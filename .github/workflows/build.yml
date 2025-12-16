@@ -21,25 +21,21 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Build application
-        run: npm run build
-
-      - name: Package for Windows
-        run: npm run package:win
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          USE_HARD_LINKS: false
+      - name: Build Windows app
+        run: npm run dist:win
 
       - name: List release folder
-        run: dir release
+        run: dir release /s
         shell: cmd
         if: always()
 
-      - name: Upload Windows artifact
+      - name: Upload Windows installer
         uses: actions/upload-artifact@v4
         with:
           name: secure-bridge-windows
-          path: release/*.zip
+          path: |
+            release/installer/*.exe
+            release/*.zip
           if-no-files-found: warn
 
   build-mac:
@@ -56,15 +52,13 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Build application
-        run: npm run build
+      - name: Build Mac app
+        run: npm run dist:mac
 
-      - name: Package for Mac
-        run: npm run package:mac
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CSC_IDENTITY_AUTO_DISCOVERY: false
-          USE_HARD_LINKS: false
+      - name: Create Mac zip
+        run: |
+          cd release
+          zip -r "SecureBridgePremium-1.0.0-mac.zip" "Secure Bridge Premium-darwin-x64"
 
       - name: List release folder
         run: ls -la release/
@@ -91,14 +85,13 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Build application
-        run: npm run build
+      - name: Build Linux app
+        run: npm run dist:linux
 
-      - name: Package for Linux
-        run: npm run package:linux
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          USE_HARD_LINKS: false
+      - name: Create Linux zip
+        run: |
+          cd release
+          zip -r "SecureBridgePremium-1.0.0-linux.zip" "Secure Bridge Premium-linux-x64"
 
       - name: List release folder
         run: ls -la release/
@@ -108,5 +101,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: secure-bridge-linux
-          path: release/*.AppImage
+          path: release/*.zip
           if-no-files-found: warn
