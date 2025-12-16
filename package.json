@@ -10,10 +10,9 @@
     "build": "tsc && npm run copy-renderer",
     "copy-renderer": "node scripts/copy-renderer.js",
     "dev": "npm run build && electron .",
-    "package": "electron-builder --publish=never",
-    "package:win": "electron-builder --win --publish=never",
-    "package:mac": "electron-builder --mac --publish=never",
-    "package:linux": "electron-builder --linux --publish=never"
+    "dist:win": "npm run build && node scripts/build-win.js",
+    "dist:mac": "npm run build && electron-packager . \"Secure Bridge Premium\" --platform=darwin --arch=x64 --out=release --overwrite --ignore=\"node_modules/(electron-packager|electron-winstaller)\" --ignore=\"\\.git\" --ignore=\"release\"",
+    "dist:linux": "npm run build && electron-packager . \"Secure Bridge Premium\" --platform=linux --arch=x64 --out=release --overwrite --ignore=\"node_modules/(electron-packager|electron-winstaller)\" --ignore=\"\\.git\" --ignore=\"release\""
   },
   "dependencies": {
     "@alpacahq/alpaca-trade-api": "^3.0.0",
@@ -24,53 +23,10 @@
   "devDependencies": {
     "@types/node": "^20.0.0",
     "@types/ws": "^8.5.0",
+    "archiver": "^6.0.1",
     "electron": "^28.0.0",
-    "electron-builder": "^24.0.0",
+    "electron-packager": "^17.1.2",
+    "electron-winstaller": "^5.3.1",
     "typescript": "^5.0.0"
-  },
-  "build": {
-    "appId": "com.xchange-suite.secure-bridge",
-    "productName": "Secure Bridge Premium",
-    "publish": null,
-    "directories": {
-      "output": "release"
-    },
-    "files": [
-      "dist/**/*",
-      "package.json"
-    ],
-    "extraResources": [],
-    "asar": true,
-    "win": {
-      "target": [
-        {
-          "target": "zip",
-          "arch": ["x64"]
-        }
-      ],
-      "artifactName": "${productName}-${version}-win.${ext}"
-    },
-    "mac": {
-      "target": [
-        {
-          "target": "zip",
-          "arch": ["x64"]
-        }
-      ],
-      "identity": null,
-      "gatekeeperAssess": false,
-      "category": "public.app-category.finance",
-      "artifactName": "${productName}-${version}-mac.${ext}"
-    },
-    "linux": {
-      "target": [
-        {
-          "target": "AppImage",
-          "arch": ["x64"]
-        }
-      ],
-      "category": "Finance",
-      "artifactName": "${productName}-${version}-linux.${ext}"
-    }
   }
 }
