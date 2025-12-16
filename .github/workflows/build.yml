@@ -24,14 +24,11 @@ jobs:
       - name: Build application
         run: npm run build
 
-      - name: List dist folder
-        run: dir dist
-        shell: cmd
-
       - name: Package for Windows
-        run: npx electron-builder --win zip
+        run: npm run package:win
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          USE_HARD_LINKS: false
 
       - name: List release folder
         run: dir release
@@ -42,7 +39,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: secure-bridge-windows
-          path: release/*-win*.zip
+          path: release/*.zip
           if-no-files-found: warn
 
   build-mac:
@@ -63,9 +60,11 @@ jobs:
         run: npm run build
 
       - name: Package for Mac
-        run: npx electron-builder --mac zip
+        run: npm run package:mac
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+          USE_HARD_LINKS: false
 
       - name: List release folder
         run: ls -la release/
@@ -75,7 +74,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: secure-bridge-mac
-          path: release/*-mac*.zip
+          path: release/*.zip
           if-no-files-found: warn
 
   build-linux:
@@ -96,9 +95,10 @@ jobs:
         run: npm run build
 
       - name: Package for Linux
-        run: npx electron-builder --linux --config.linux.target=AppImage
+        run: npm run package:linux
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          USE_HARD_LINKS: false
 
       - name: List release folder
         run: ls -la release/
