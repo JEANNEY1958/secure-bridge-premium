@@ -44,11 +44,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: secure-bridge-${{ matrix.platform }}
-          path: |
-            release/*.exe
-            release/*.dmg
-            release/*.AppImage
-            release/*.deb
+          path: release/*
           if-no-files-found: ignore
 
   release:
