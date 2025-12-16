@@ -10,10 +10,10 @@
     "build": "tsc && npm run copy-renderer",
     "copy-renderer": "node scripts/copy-renderer.js",
     "dev": "npm run build && electron .",
-    "package": "electron-builder",
-    "package:win": "electron-builder --win",
-    "package:mac": "electron-builder --mac",
-    "package:linux": "electron-builder --linux"
+    "package": "electron-builder --publish=never",
+    "package:win": "electron-builder --win --publish=never",
+    "package:mac": "electron-builder --mac --publish=never",
+    "package:linux": "electron-builder --linux --publish=never"
   },
   "dependencies": {
     "@alpacahq/alpaca-trade-api": "^3.0.0",
@@ -31,6 +31,7 @@
   "build": {
     "appId": "com.xchange-suite.secure-bridge",
     "productName": "Secure Bridge Premium",
+    "publish": null,
     "directories": {
       "output": "release"
     },
@@ -43,7 +44,7 @@
     "win": {
       "target": [
         {
-          "target": "portable",
+          "target": "zip",
           "arch": ["x64"]
         }
       ],
@@ -56,6 +57,8 @@
           "arch": ["x64"]
         }
       ],
+      "identity": null,
+      "gatekeeperAssess": false,
       "category": "public.app-category.finance",
       "artifactName": "${productName}-${version}-mac.${ext}"
     },
