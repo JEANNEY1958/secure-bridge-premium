@@ -29,9 +29,15 @@ jobs:
         shell: cmd
 
       - name: Package for Windows
-        run: npx electron-builder --win --config.win.target=portable
+        run: npx electron-builder --win dir
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create zip from win-unpacked
+        run: |
+          cd release
+          powershell Compress-Archive -Path "win-unpacked\*" -DestinationPath "Secure-Bridge-Premium-1.0.0-win.zip"
+        shell: cmd
 
       - name: List release folder
         run: dir release
@@ -42,7 +48,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: secure-bridge-windows
-          path: release/*.exe
+          path: release/*.zip
           if-no-files-found: warn
 
   build-mac:
@@ -63,9 +69,14 @@ jobs:
         run: npm run build
 
       - name: Package for Mac
-        run: npx electron-builder --mac --config.mac.target=zip
+        run: npx electron-builder --mac dir
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create zip from mac folder
+        run: |
+          cd release
+          zip -r "Secure-Bridge-Premium-1.0.0-mac.zip" "mac" || zip -r "Secure-Bridge-Premium-1.0.0-mac.zip" *.app || true
 
       - name: List release folder
         run: ls -la release/
