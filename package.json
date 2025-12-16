@@ -7,10 +7,10 @@
   "license": "MIT",
   "scripts": {
     "start": "electron .",
-    "build": "tsc && npm run copy-assets",
-    "copy-assets": "cp -r src/renderer dist/",
+    "build": "tsc",
+    "postbuild": "node -e \"const fs=require('fs');const path=require('path');function copy(s,d){if(fs.statSync(s).isDirectory()){fs.mkdirSync(d,{recursive:true});fs.readdirSync(s).forEach(f=>copy(path.join(s,f),path.join(d,f)))}else{fs.copyFileSync(s,d)}}copy('src/renderer','dist/renderer')\"",
     "dev": "npm run build && electron .",
-    "package": "npm run build && electron-builder"
+    "package": "electron-builder"
   },
   "dependencies": {
     "@alpacahq/alpaca-trade-api": "^3.0.0",
