@@ -7,19 +7,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
-    strategy:
-      matrix:
-        include:
-          - os: windows-latest
-            platform: win
-          - os: macos-latest
-            platform: mac
-          - os: ubuntu-latest
-            platform: linux
-
-    runs-on: ${{ matrix.os }}
-
+  build-windows:
+    runs-on: windows-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -35,33 +24,89 @@ jobs:
       - name: Build application
         run: npm run build
 
-      - name: Package for ${{ matrix.platform }}
-        run: npm run package
+      - name: List dist folder
+        run: dir dist
+        shell: cmd
+
+      - name: Package for Windows
+        run: npx electron-builder --win --config.win.target=portable
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload artifacts
+      - name: List release folder
+        run: dir release
+        shell: cmd
+        if: always()
+
+      - name: Upload Windows artifact
         uses: actions/upload-artifact@v4
         with:
-          name: secure-bridge-${{ matrix.platform }}
-          path: release/*
-          if-no-files-found: ignore
+          name: secure-bridge-windows
+          path: release/*.exe
+          if-no-files-found: warn
 
-  release:
-    needs: build
-    runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/')
-    
+  build-mac:
+    runs-on: macos-latest
     steps:
-      - name: Download all artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: artifacts
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Create Release
-        uses: softprops/action-gh-release@v1
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          files: artifacts/**/*
-          generate_release_notes: true
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build application
+        run: npm run build
+
+      - name: Package for Mac
+        run: npx electron-builder --mac --config.mac.target=zip
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: List release folder
+        run: ls -la release/
+        if: always()
+
+      - name: Upload Mac artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: secure-bridge-mac
+          path: release/*.zip
+          if-no-files-found: warn
+
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build application
+        run: npm run build
+
+      - name: Package for Linux
+        run: npx electron-builder --linux --config.linux.target=AppImage
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: List release folder
+        run: ls -la release/
+        if: always()
+
+      - name: Upload Linux artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: secure-bridge-linux
+          path: release/*.AppImage
+          if-no-files-found: warn
